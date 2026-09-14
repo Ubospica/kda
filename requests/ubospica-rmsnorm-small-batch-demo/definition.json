@@ -1,0 +1,46 @@
+{
+  "name": "ubospica_rmsnorm_bf16_h4096_small_batch_demo",
+  "op_type": "rmsnorm",
+  "description": "Illustrative small-batch decoder RMSNorm task for previewing the wishlist submission flow; bfloat16 tensors with a float32 mathematical reference.",
+  "axes": {
+    "batch_size": {
+      "type": "var"
+    },
+    "hidden_size": {
+      "type": "const",
+      "value": 4096
+    }
+  },
+  "inputs": {
+    "input": {
+      "shape": [
+        "batch_size",
+        "hidden_size"
+      ],
+      "dtype": "bfloat16"
+    },
+    "weight": {
+      "shape": [
+        "hidden_size"
+      ],
+      "dtype": "bfloat16"
+    },
+    "eps": {
+      "shape": null,
+      "dtype": "float32"
+    }
+  },
+  "outputs": {
+    "output": {
+      "shape": [
+        "batch_size",
+        "hidden_size"
+      ],
+      "dtype": "bfloat16"
+    }
+  },
+  "constraints": [
+    "batch_size >= 1"
+  ],
+  "reference": "# SPDX-License-Identifier: Apache-2.0\nimport torch\n\ndef run(input, weight, eps):\n    x = input.to(torch.float32)\n    variance = (x * x).mean(dim=-1, keepdim=True)\n    normalized = x * torch.rsqrt(variance + eps)\n    return (normalized * weight.to(torch.float32)).to(input.dtype)\n"
+}
